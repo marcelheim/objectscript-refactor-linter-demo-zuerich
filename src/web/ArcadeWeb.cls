@@ -7,6 +7,7 @@ ClassMethod OnPage() As %Status
 {
     Set action = %request.Get("action")
     If action = "top"    { Quit ..LbTop() }
+    If action = "search" { Quit ..LbSearch() }
     If action = "submit" { Quit ..LbSubmit() }
     Do ..ServeHTML()
     Quit $$$OK
@@ -16,6 +17,15 @@ ClassMethod LbTop() As %Status
 {
     Set %response.ContentType = "application/json"
     Set rows = $$Top^arcade.score.Board("INVADERS^10")
+    Write "{""rows"":"""_rows_"""}"
+    Quit $$$OK
+}
+
+ClassMethod LbSearch() As %Status
+{
+    Set %response.ContentType = "application/json"
+    Set filter = %request.Get("filter")
+    Set rows = $$Search^arcade.score.Board(filter)
     Write "{""rows"":"""_rows_"""}"
     Quit $$$OK
 }
@@ -67,6 +77,10 @@ ClassMethod ServeHTML() As %Status
     Write "  button:hover { background:#ffb000; color:#140d00; }",!
     Write "  .board { border:1px solid #4a3000; min-width:300px; }",!
     Write "  .board .ttl { font-size:0.6rem; letter-spacing:0.25em; color:#7a4a00; padding:0.6rem 1rem; border-bottom:1px solid #2a1c00; }",!
+    Write "  .filter { width:100%; background:#0a0600; border:none; border-bottom:1px solid #2a1c00;",!
+    Write "            color:#ffb000; font-family:'Courier New',monospace; font-size:0.7rem;",!
+    Write "            letter-spacing:0.08em; padding:0.55rem 1rem; outline:none; }",!
+    Write "  .filter::placeholder { color:#5a3c00; }",!
     Write "  .row { display:grid; grid-template-columns:40px 1fr 90px; padding:0.4rem 1rem;",!
     Write "         font-size:0.85rem; letter-spacing:0.1em; border-bottom:1px solid #2a1c00; }",!
     Write "  .row .sc { text-align:right; }",!
@@ -94,6 +108,7 @@ ClassMethod ServeHTML() As %Status
     Write "    </div>",!
     Write "    <div class='board'>",!
     Write "      <div class='ttl'>HIGH SCORES</div>",!
+    Write "      <input id='filter' class='filter' placeholder='FILTER  e.g.  sc>2000' autocomplete='off'>",!
     Write "      <div id='rows'></div>",!
     Write "    </div>",!
     Write "  </div>",!
@@ -115,7 +130,7 @@ ClassMethod ServeHTML() As %Status
     Write "      if(r>=bh-2&&c>=2&&c<=4)continue;",!
     Write "      shields.push({x:bx+c*bs,y:by+r*bs,w:bs,h:bs});}}}",!
     Write "function alive(){return inv.filter(a=>a.alive);}",!
-    Write "document.addEventListener('keydown',e=>{keys[e.code]=true;",!
+    Write "document.addEventListener('keydown',e=>{if(e.target.tagName==='INPUT')return;keys[e.code]=true;",!
     Write "  if(['ArrowLeft','ArrowRight','Space'].includes(e.code))e.preventDefault();",!
     Write "  if(e.code==='Enter'){if(state==='start')reset();else if(state==='over')doSubmit();}});",!
     Write "document.addEventListener('keyup',e=>{keys[e.code]=false;});",!
@@ -177,7 +192,8 @@ ClassMethod ServeHTML() As %Status
     Write "    '<input id=\""ini\"" maxlength=\""3\"" placeholder=\""AAA\"" autocomplete=\""off\"">';",!
     Write "  document.getElementById('ovhint').innerHTML='[ ENTER TO SAVE SCORE ]';",!
     Write "  ov.classList.remove('hidden');",!
-    Write "  document.getElementById('ini').focus();",!
+    Write "  const ini=document.getElementById('ini');ini.focus();",!
+    Write "  ini.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();doSubmit();}});",!
     Write "}",!
     Write "async function doSubmit(){",!
     Write "  const el=document.getElementById('ini');",!
@@ -188,7 +204,8 @@ ClassMethod ServeHTML() As %Status
     Write "  showOverlay('SPACE INVADERS','&larr; &rarr; MOVE &nbsp; SPACE FIRE','[ PRESS ENTER TO START ]');",!
     Write "}",!
     Write "async function loadBoard(){",!
-    Write "  const d=await(await fetch('?action=top')).json();",!
+    Write "  const f=document.getElementById('filter');const q=f?f.value.trim():'';",!
+    Write "  const d=await(await fetch('?action=search&filter='+encodeURIComponent(q))).json();",!
     Write "  const box=document.getElementById('rows');box.innerHTML='';",!
     Write "  if(!d.rows){box.innerHTML='<div class=\""empty\"">NO SCORES YET</div>';return;}",!
     Write "  d.rows.split('|').forEach(r=>{const p=r.split('^');const row=document.createElement('div');",!
@@ -197,6 +214,7 @@ ClassMethod ServeHTML() As %Status
     Write "    box.appendChild(row);});}",!
     Write "function esc(s){const d=document.createElement('div');d.textContent=s;return d.innerHTML;}",!
     Write "const _start=reset;reset=function(){startLoop();_start();};",!
+    Write "document.getElementById('filter').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();loadBoard();}});",!
     Write "loadBoard();requestAnimationFrame(loop);",!
     Write "</script>",!
     Write "</body>",!
