@@ -1,0 +1,41 @@
+name: oto-lint
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  security-events: write
+
+jobs:
+  oto-lint:
+    runs-on: ubuntu-latest
+    env:
+      LINT_BIN: bin/oto-lint.linux
+    steps:
+      - uses: actions/checkout@v4
+
+      - run: chmod +x "$LINT_BIN"
+
+      - name: Run oto-lint
+        id: lint
+        run: |
+          FILES=$(find src -name '*.mac' | sort)
+          echo "Linting:" $FILES
+          set +e
+          ./"$LINT_BIN" --config=.oto-lint.json --format=sarif $FILES > results.sarif
+          echo "exit=$?" >> "$GITHUB_OUTPUT"
+          ./"$LINT_BIN" --config=.oto-lint.json --format=text $FILES
+          set -e
+
+      - name: Upload SARIF
+        if: always()
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: results.sarif
+          category: oto-lint
+
+      - if: always()
+        run: exit ${{ steps.lint.outputs.exit }}

@@ -1,0 +1,14 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "oto-lint: Board SARIF",
+      "type": "shell",
+      "command": "if (!(Test-Path .\\tmp)) { New-Item -ItemType Directory -Path .\\tmp | Out-Null }; .\\bin\\oto-lint.exe --format=sarif .\\src\\score\\Board.mac > .\\tmp\\lint.sarif",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

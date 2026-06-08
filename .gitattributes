@@ -1,0 +1,4 @@
+bin/oto-lint.exe    binary
+bin/oto-lint.linux  binary
+src/score/Board.mac text eol=lf
+src/web/ArcadeWeb.cls text eol=lf

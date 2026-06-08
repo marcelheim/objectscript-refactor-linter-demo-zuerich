@@ -1,0 +1,24 @@
+    zn "%SYS"
+
+    do ##class(Security.Users).UnExpireUserPasswords("*")
+
+    do $SYSTEM.OBJ.Load("/home/irisowner/dev/App.Installer.cls", "ck")
+    set sc = ##class(App.Installer).setup()
+
+    zn "IRISAPP"
+
+    do $SYSTEM.OBJ.Load("/home/irisowner/dev/src/score/Board.mac", "ck")
+    do $SYSTEM.OBJ.Load("/home/irisowner/dev/src/web/ArcadeWeb.cls", "ck")
+
+    set r = $$Submit^arcade.score.Board("INVADERS^ZAP^9990")
+    set r = $$Submit^arcade.score.Board("INVADERS^POG^8675")
+    set r = $$Submit^arcade.score.Board("INVADERS^HAX^8042")
+    set r = $$Submit^arcade.score.Board("INVADERS^ACE^7777")
+    set r = $$Submit^arcade.score.Board("INVADERS^NEO^6502")
+    set r = $$Submit^arcade.score.Board("INVADERS^BIT^5150")
+    set r = $$Submit^arcade.score.Board("INVADERS^GG^4096")
+    set r = $$Submit^arcade.score.Board("INVADERS^UWU^2600")
+    set r = $$Submit^arcade.score.Board("INVADERS^FOO^1024")
+    set r = $$Submit^arcade.score.Board("INVADERS^ORB^404")
+
+    halt

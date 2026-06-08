@@ -1,0 +1,19 @@
+{
+  "error_on": "error",
+  "xecute-usage": {
+    "enabled": true,
+    "severity": "error"
+  },
+  "kill-all": {
+    "enabled": true,
+    "severity": "warn"
+  },
+  "postconditional-usage": {
+    "enabled": false,
+    "severity": "info"
+  },
+  "global-access": {
+    "enabled": false,
+    "severity": "info"
+  }
+}

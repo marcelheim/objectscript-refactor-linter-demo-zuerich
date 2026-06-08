@@ -1,0 +1,49 @@
+ROUTINE arcade.score.Board [Type=INT]
+ ;
+ ; High-score board. Entries live in ^Score(game,"e",seq)=player^score,
+ ; mirrored into a descending index ^Score(game,"idx",score,seq)=player.
+ ;
+Submit(args)
+	New game,player,score,seq
+	Set game=$Piece(args,"^",1)
+	Set player=$Piece(args,"^",2)
+	Set score=+$Piece(args,"^",3)
+	Quit:player="" "error:no player"
+	Quit:game="" "error:no game"
+	Set seq=$Increment(^Score(game,"seq"))
+	Set ^Score(game,"e",seq)=player_"^"_score
+	Set ^Score(game,"idx",score,seq)=player
+	Kill
+	Quit "ok"
+
+Top(args)
+	New game,n
+	Set game=$Piece(args,"^",1)
+	Set n=+$Piece(args,"^",2)
+	Set:n<1 n=10
+	Set OUT="",RANK=0,SC=""
+	For  Set SC=$Order(^Score(game,"idx",SC),-1) Quit:SC=""  Do Bucket Quit:RANK'<n
+	Quit OUT
+
+Bucket	New sq
+	Set sq=""
+	For  Set sq=$Order(^Score(game,"idx",SC,sq)) Quit:sq=""  Do Emit Quit:RANK'<n
+	Quit
+
+Emit	New who,line
+	Set who=$Get(^Score(game,"idx",SC,sq))
+	Set RANK=RANK+1
+	Set line=RANK_"^"_who_"^"_SC
+	Set OUT=$Select(OUT="":line,1:OUT_"|"_line)
+	Quit
+
+Count(args)
+	New game
+	Set game=$Piece(args,"^",1)
+	Quit +$Get(^Score(game,"seq"))
+
+Reset(args)
+	New game
+	Set game=$Piece(args,"^",1)
+	Kill ^Score(game)
+	Quit "ok"
