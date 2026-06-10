@@ -9,7 +9,7 @@
     "severity": "warn"
   },
   "postconditional-usage": {
-    "enabled": false,
+    "enabled": true,
     "severity": "info"
   },
   "global-access": {
