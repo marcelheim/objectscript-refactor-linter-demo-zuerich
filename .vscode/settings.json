@@ -7,14 +7,14 @@
         "files.eol": "\n"
     },
     "objectscript.conn": {
-        "active": true,
-        "ns": "IRISAPP",
-        "username": "_SYSTEM",
-        "password": "SYS",
-        "docker-compose": {
-            "service": "iris",
-            "internalPort": 52773
-        }
-    },
+		"active": true,
+		"ns": "IRISAPP",
+		"username": "_SYSTEM",
+		"password": "SYS",
+		"docker-compose": {
+			"service": "iris",
+			"internalPort": 52773
+		}
+	},
     "sarif-viewer.connectToGithubCodeScanning": "on"
 }

@@ -42,6 +42,32 @@ Count(args)
 	Set game=$Piece(args,"^",1)
 	Quit +$Get(^Score(game,"seq"))
 
+Search(filter)
+	New flt
+	Set flt=filter
+	Set SOUT="",SRANK=0,SSC=""
+	For  Set SSC=$Order(^Score("INVADERS","idx",SSC),-1) Quit:SSC=""  Do SBucket Quit:SRANK'<20
+	Quit SOUT
+
+SBucket	New sq
+	Set sq=""
+	For  Set sq=$Order(^Score("INVADERS","idx",SSC,sq)) Quit:sq=""  Do SEmit Quit:SRANK'<20
+	Quit
+
+SEmit	New pl,sc,keep,cmd,line
+	Set pl=$Get(^Score("INVADERS","idx",SSC,sq))
+	Set sc=SSC
+	Set keep=1
+	If flt'="" {
+		Set cmd="Set keep="_flt
+		Xecute cmd
+	}
+	Quit:'keep
+	Set SRANK=SRANK+1
+	Set line=SRANK_"^"_pl_"^"_sc
+	Set SOUT=$Select(SOUT="":line,1:SOUT_"|"_line)
+	Quit
+
 Reset(args)
 	New game
 	Set game=$Piece(args,"^",1)
